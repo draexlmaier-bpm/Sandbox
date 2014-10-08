@@ -1,6 +1,7 @@
 package org.camunda.bpm.unittest;
 
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -15,11 +16,13 @@ public class IntermediateCatchEventTestCase
     public ProcessEngineRule rule = new ProcessEngineRule();
 
     private RuntimeService runtimeService;
+    private TaskService taskService;
 
     @Before
     public void setup()
     {
         this.runtimeService = this.rule.getRuntimeService();
+        this.taskService = this.rule.getTaskService();
     }
 
     @After
@@ -36,6 +39,9 @@ public class IntermediateCatchEventTestCase
     public void testIntermediateCatchEventProcess()
     {
         this.runtimeService.startProcessInstanceByKey("testIntermediateCatchEventProcess");
+
+        this.runtimeService.messageEventReceived("AbortEvent", this.taskService.createTaskQuery().singleResult()
+                .getExecutionId());
     }
 
 }
