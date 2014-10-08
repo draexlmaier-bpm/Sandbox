@@ -1,16 +1,22 @@
 package de.draexlmaier.bpm.process.repro;
 
+import static javax.ejb.TransactionManagementType.BEAN;
+
 import javax.annotation.Resource;
 import javax.ejb.Singleton;
+import javax.ejb.TransactionManagement;
 import javax.inject.Inject;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.task.Task;
+import org.jboss.logging.Logger;
 
 @Singleton
+@TransactionManagement(BEAN)
 public class TaskPollingEJB implements TaskPollingEJBLocal
 {
     @Inject
@@ -19,28 +25,23 @@ public class TaskPollingEJB implements TaskPollingEJBLocal
     @Inject
     private TaskService taskService;
 
-    @Resource(lookup = "java:/TransactionManager")
-    private TransactionManager transactionManager;
+    @Resource
+    private UserTransaction tx;
+
+    private static Logger logger = Logger.getLogger(TaskPollingEJB.class);
 
     @Override
     public void pollNow()
     {
         for(final Task task : this.taskService.createTaskQuery().list())
         {
-            boolean completeTask = false;
             try
             {
-                completeTask = handleTaskInternal(task);
+                handleTaskInternal(task);
             }
-            catch(final Exception ex)
+            catch(final NotSupportedException | SystemException ex)
             {
-                logIncident(task, ex);
-                continue;
-            }
-
-            if(completeTask)
-            {
-                this.taskService.complete(task.getId());
+                logger.error("Oops!", ex);
             }
         }
     }
@@ -50,47 +51,40 @@ public class TaskPollingEJB implements TaskPollingEJBLocal
         return true;
     }
 
-    private boolean handleTaskInternal(final Task task) throws Exception
+    private void handleTaskInternal(final Task task) throws NotSupportedException, SystemException
     {
-        // Suspend current TX and start a new one to process this one task
-        final Transaction oldTx = this.transactionManager.suspend();
-        this.transactionManager.begin();
+        this.tx.begin();
 
         // Associate task (needed in internal code later)
         this.businessProcess.setTask(task);
 
-        boolean result = false;
-
         try
         {
             // Do the real work
-            result = handleTask(task);
+            final boolean result = handleTask(task);
 
             // Flush data
             this.businessProcess.flushVariableCache();
             this.businessProcess.saveTask();
 
-            this.transactionManager.commit();
+            if(result)
+            {
+                this.taskService.complete(task.getId());
+            }
+
+            this.tx.commit();
         }
         catch(final Exception ex)
         {
-            this.transactionManager.rollback();
+            this.tx.rollback();
 
-            throw ex;
+            logIncident(task, ex);
         }
         finally
         {
             // Disassociate task
             this.businessProcess.stopTask();
-
-            // Restore old TX (if there)
-            if(oldTx != null)
-            {
-                this.transactionManager.resume(oldTx);
-            }
         }
-
-        return result;
     }
 
     private void logIncident(final Task task, final Exception ex)

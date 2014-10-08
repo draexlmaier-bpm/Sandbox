@@ -6,7 +6,7 @@
     </bpmn2:startEvent>
     <bpmn2:intermediateCatchEvent id="IntermediateCatchEvent_2" name="Intermediate Catch Event&#xD;&#xA;">
       <bpmn2:extensionElements>
-        <camunda:executionListener class="org.camunda.bpm.unittest.IntermediateCatchEventListener" event="start"/>
+        <camunda:executionListener class="org.camunda.bpm.unittest.IntermediateCatchEventListener" event="end"/>
       </bpmn2:extensionElements>
       <bpmn2:incoming>SequenceFlow_5</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>

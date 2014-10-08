@@ -2,6 +2,7 @@ package de.draexlmaier.bpm.process.repro;
 
 import javax.inject.Inject;
 
+import org.camunda.bpm.engine.RuntimeService;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -22,15 +23,22 @@ public class ProcessTestTxExceptions
                 .addLibraries(DependencyResolver.resolveMavenDependencies(true, false))//
                 .addBeansXml("META-INF/beans.xml")//
                 .addProcessesXml("META-INF/processes.xml")//
+                .addBpmnProcessFiles()//
                 .getWebArchive();
     }
 
     @Inject
     private TaskPollingEJBLocal taskPollingEJB;
 
+    @Inject
+    RuntimeService runtimeService;
+
     @Test
     public void testIt()
     {
+        this.runtimeService.startProcessInstanceByKey("reproProcessTx");
+        this.runtimeService.startProcessInstanceByKey("reproProcessTx");
+
         this.taskPollingEJB.pollNow();
     }
 }
