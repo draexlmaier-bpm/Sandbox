@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+        <subsystem xmlns="urn:org.camunda.bpm.jboss:1.1">
+            <process-engines>
+                <process-engine name="default" default="true">
+                    <datasource>
+                        java:jboss/datasources/CamundaDS
+                    </datasource>
+                    <history-level>
+                        full
+                    </history-level>
+                    <configuration>
+                        org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration
+                    </configuration>
+                    <properties>
+                        <property name="jobExecutorAcquisitionName">
+                            default
+                        </property>
+                        <property name="isAutoSchemaUpdate">
+                            true
+                        </property>
+                        <property name="authorizationEnabled">
+                            true
+                        </property>
+                        <property name="jobExecutorDeploymentAware">
+                            true
+                        </property>
+                    </properties>
+                    <plugins>
+                        <plugin>
+                            <class>
+                                org.camunda.bpm.application.impl.event.ProcessApplicationEventListenerPlugin
+                            </class>
+                        </plugin>
+                    </plugins>
+                </process-engine>
+            </process-engines>
+            <job-executor>
+                <thread-pool-name>
+                    camunda-job-executor-tp
+                </thread-pool-name>
+                <job-acquisitions>
+                    <job-acquisition name="default">
+                        <acquisition-strategy>
+                            SEQUENTIAL
+                        </acquisition-strategy>
+                        <properties>
+                            <property name="lockTimeInMillis">
+                                300000
+                            </property>
+                            <property name="waitTimeInMillis">
+                                5000
+                            </property>
+                            <property name="maxJobsPerAcquisition">
+                                3
+                            </property>
+                        </properties>
+                    </job-acquisition>
+                </job-acquisitions>
+            </job-executor>
+        </subsystem>
