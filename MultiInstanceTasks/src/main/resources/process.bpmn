@@ -19,10 +19,6 @@
       <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
     </bpmn2:endEvent>
     <bpmn2:userTask id="UserTask_1" camunda:formKey="fooTask" name="FooTask">
-      <bpmn2:extensionElements>
-        <camunda:executionListener class="de.draexlmaier.bpm.demo.mit.TaskEndExecutionListener" event="end"/>
-        <camunda:taskListener class="de.draexlmaier.bpm.demo.mit.TaskEndTaskListener" event="complete"/>
-      </bpmn2:extensionElements>
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
       <bpmn2:multiInstanceLoopCharacteristics camunda:collection="items" camunda:elementVariable="item"/>
