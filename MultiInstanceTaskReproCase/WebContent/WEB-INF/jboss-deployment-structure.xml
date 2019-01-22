@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<jboss-deployment-structure>
+	<ear-subdeployments-isolated>false</ear-subdeployments-isolated>
+	<deployment>
+		<exclusions>
+			<module name="javaee.api" />
+		</exclusions>
+		<dependencies>
+			<module name="javax.annotation.api" />
+			<module name="javax.enterprise.api" />
+			<module name="javax.inject.api" />
+			<module name="javax.interceptor.api" />
+			<module name="javax.validation.api" />
+			<module name="javax.mail.api" />
+			
+			<module name="org.jboss.logging" />
+			<module name="org.jboss.modules" />
+
+			<module name="javax.ejb.api" /> <!-- For EJB application -->
+			<module name="javax.jws.api" /> <!-- For WS provider -->
+			<module name="javax.xml.ws.api" /> <!-- For WS client -->
+			<module name="javax.ws.rs.api" /> <!-- For RS provider -->
+		</dependencies>
+	</deployment>
+</jboss-deployment-structure>

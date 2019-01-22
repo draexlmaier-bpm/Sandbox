@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:fox="http://www.camunda.com/fox" id="_aWdoMGg4EeWll9tTk-EJMA" targetNamespace="http://camunda.org/schema/1.0/bpmn" exporter="Camunda Modeler" exporterVersion="2.2.1" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:collaboration id="_Collaboration_2">
+    <bpmn2:participant id="poolDemo" name="Demo" processRef="processDemo" />
+  </bpmn2:collaboration>
+  <bpmn2:process id="processDemo" name="ReproCase for MultiInstance Problem" isExecutable="true">
+    <bpmn2:startEvent id="evtStart" name="Start">
+      <bpmn2:outgoing>SequenceFlow_02un8s2</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:userTask id="Task1" name="Task 1">
+      <bpmn2:incoming>SequenceFlow_02un8s2</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_141ckk1</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Task2" name="Task 2">
+      <bpmn2:incoming>SequenceFlow_141ckk1</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_10ioq6e</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Task3" name="Task 3">
+      <bpmn2:incoming>SequenceFlow_10ioq6e</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_1j2obdj</bpmn2:outgoing>
+      <bpmn2:outgoing>SequenceFlow_18pf0y5</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:endEvent id="Escalation1" name="Escalation 1">
+      <bpmn2:incoming>SequenceFlow_1eaxfnu</bpmn2:incoming>
+      <bpmn2:escalationEventDefinition />
+    </bpmn2:endEvent>
+    <bpmn2:endEvent id="evtEnd" name="End	">
+      <bpmn2:incoming>SequenceFlow_1j2obdj</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:userTask id="Task4" name="Multi Task 4">
+      <bpmn2:incoming>SequenceFlow_18pf0y5</bpmn2:incoming>
+      <bpmn2:multiInstanceLoopCharacteristics camunda:collection="$SomeCollection" camunda:elementVariable="oneTask" />
+    </bpmn2:userTask>
+    <bpmn2:endEvent id="Escalation2" name="Escalation 2">
+      <bpmn2:incoming>SequenceFlow_0fufniu</bpmn2:incoming>
+      <bpmn2:escalationEventDefinition />
+    </bpmn2:endEvent>
+    <bpmn2:serviceTask id="SendMail1" name="Send Reminder Mail 1" camunda:asyncBefore="true">
+      <bpmn2:incoming>SequenceFlow_0hmlgr2</bpmn2:incoming>
+    </bpmn2:serviceTask>
+    <bpmn2:subProcess id="SubProcessEscalation" name="Event SubProcess Escalation" triggeredByEvent="true">
+      <bpmn2:startEvent id="StartEvent_0c03hxt">
+        <bpmn2:outgoing>SequenceFlow_14obqqq</bpmn2:outgoing>
+        <bpmn2:escalationEventDefinition />
+      </bpmn2:startEvent>
+      <bpmn2:sequenceFlow id="SequenceFlow_14obqqq" sourceRef="StartEvent_0c03hxt" targetRef="SendMail2" />
+      <bpmn2:serviceTask id="SendMail2" name="Send Reminder Mail 2">
+        <bpmn2:incoming>SequenceFlow_14obqqq</bpmn2:incoming>
+        <bpmn2:outgoing>SequenceFlow_1fs1vqh</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:endEvent id="EndEvent_0y6a11a">
+        <bpmn2:incoming>SequenceFlow_1fs1vqh</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="SequenceFlow_1fs1vqh" sourceRef="SendMail2" targetRef="EndEvent_0y6a11a" />
+    </bpmn2:subProcess>
+    <bpmn2:boundaryEvent id="Timer1" name="Timer 1" cancelActivity="false" attachedToRef="Task1">
+      <bpmn2:extensionElements>
+        <camunda:executionListener class="de.draexlmaier.bpm.process.multiinstancetaskreprocase.Listener1" event="start" />
+      </bpmn2:extensionElements>
+      <bpmn2:timerEventDefinition>
+        <bpmn2:timeDate xsi:type="bpmn2:tFormalExpression">2018-01-22T23:59:59</bpmn2:timeDate>
+      </bpmn2:timerEventDefinition>
+    </bpmn2:boundaryEvent>
+    <bpmn2:boundaryEvent id="Timer4" name="Timer 4" cancelActivity="false" attachedToRef="Task4">
+      <bpmn2:outgoing>SequenceFlow_0fufniu</bpmn2:outgoing>
+      <bpmn2:timerEventDefinition>
+        <bpmn2:timeDate xsi:type="bpmn2:tFormalExpression">2018-01-22T23:59:59</bpmn2:timeDate>
+      </bpmn2:timerEventDefinition>
+    </bpmn2:boundaryEvent>
+    <bpmn2:boundaryEvent id="Timer3" name="Timer 3" cancelActivity="false" attachedToRef="Task3">
+      <bpmn2:outgoing>SequenceFlow_1eaxfnu</bpmn2:outgoing>
+      <bpmn2:timerEventDefinition>
+        <bpmn2:timeDate xsi:type="bpmn2:tFormalExpression">2018-01-22T23:59:59</bpmn2:timeDate>
+      </bpmn2:timerEventDefinition>
+    </bpmn2:boundaryEvent>
+    <bpmn2:boundaryEvent id="Timer2" name="Timer 2" cancelActivity="false" attachedToRef="Task2">
+      <bpmn2:outgoing>SequenceFlow_0hmlgr2</bpmn2:outgoing>
+      <bpmn2:timerEventDefinition>
+        <bpmn2:timeDate xsi:type="bpmn2:tFormalExpression">2018-01-22T23:59:59</bpmn2:timeDate>
+      </bpmn2:timerEventDefinition>
+    </bpmn2:boundaryEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_02un8s2" sourceRef="evtStart" targetRef="Task1" />
+    <bpmn2:sequenceFlow id="SequenceFlow_10ioq6e" sourceRef="Task2" targetRef="Task3" />
+    <bpmn2:sequenceFlow id="SequenceFlow_141ckk1" sourceRef="Task1" targetRef="Task2" />
+    <bpmn2:sequenceFlow id="SequenceFlow_1j2obdj" sourceRef="Task3" targetRef="evtEnd" />
+    <bpmn2:sequenceFlow id="SequenceFlow_0hmlgr2" sourceRef="Timer2" targetRef="SendMail1" />
+    <bpmn2:sequenceFlow id="SequenceFlow_1eaxfnu" sourceRef="Timer3" targetRef="Escalation1" />
+    <bpmn2:sequenceFlow id="SequenceFlow_18pf0y5" sourceRef="Task3" targetRef="Task4" />
+    <bpmn2:sequenceFlow id="SequenceFlow_0fufniu" sourceRef="Timer4" targetRef="Escalation2" />
+    <bpmn2:textAnnotation id="TextAnnotation_0pnl9my">
+      <bpmn2:text>Sends Mail</bpmn2:text>
+    </bpmn2:textAnnotation>
+    <bpmn2:textAnnotation id="TextAnnotation_0a82dri">
+      <bpmn2:text>evaluates TaskId</bpmn2:text>
+    </bpmn2:textAnnotation>
+    <bpmn2:textAnnotation id="TextAnnotation_1t8z17d">
+      <bpmn2:text>evaluates TaskId</bpmn2:text>
+    </bpmn2:textAnnotation>
+    <bpmn2:association id="Association_0jp0uhy" sourceRef="Timer1" targetRef="TextAnnotation_0pnl9my" />
+    <bpmn2:association id="Association_0ziaigf" sourceRef="Timer2" targetRef="TextAnnotation_0a82dri" />
+    <bpmn2:association id="Association_1856f3r" sourceRef="Timer3" targetRef="TextAnnotation_1t8z17d" />
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="_Collaboration_2">
+      <bpmndi:BPMNShape id="_BPMNShape_Participant_2" bpmnElement="poolDemo" isHorizontal="true">
+        <dc:Bounds x="93" y="257" width="1432" height="650" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="evtStart">
+        <dc:Bounds x="177" y="394" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="183" y="435" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="evtEnd">
+        <dc:Bounds x="1257" y="394" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1266" y="435" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_02un8s2_di" bpmnElement="SequenceFlow_02un8s2">
+        <di:waypoint x="213" y="412" />
+        <di:waypoint x="296" y="412" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_1u8axbk_di" bpmnElement="Task2">
+        <dc:Bounds x="463" y="372" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1hrjrtb_di" bpmnElement="Task1">
+        <dc:Bounds x="296" y="372" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_10ioq6e_di" bpmnElement="SequenceFlow_10ioq6e">
+        <di:waypoint x="563" y="412" />
+        <di:waypoint x="688" y="412" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_141ckk1_di" bpmnElement="SequenceFlow_141ckk1">
+        <di:waypoint x="396" y="412" />
+        <di:waypoint x="463" y="412" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BoundaryEvent_1fa1vz0_di" bpmnElement="Timer1">
+        <dc:Bounds x="332" y="434" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="293" y="457" width="36" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_1tney73_di" bpmnElement="Timer2">
+        <dc:Bounds x="519" y="434" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="477" y="458" width="36" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1j2obdj_di" bpmnElement="SequenceFlow_1j2obdj">
+        <di:waypoint x="788" y="412" />
+        <di:waypoint x="1257" y="412" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0hmlgr2_di" bpmnElement="SequenceFlow_0hmlgr2">
+        <di:waypoint x="537" y="470" />
+        <di:waypoint x="537" y="546" />
+        <di:waypoint x="587" y="546" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0rmwrcd_di" bpmnElement="SendMail1">
+        <dc:Bounds x="587" y="506" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0pnl9my_di" bpmnElement="TextAnnotation_0pnl9my">
+        <dc:Bounds x="383" y="475" width="55" height="39" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0jp0uhy_di" bpmnElement="Association_0jp0uhy">
+        <di:waypoint x="365" y="462" />
+        <di:waypoint x="383" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0a82dri_di" bpmnElement="TextAnnotation_0a82dri">
+        <dc:Bounds x="575" y="452" width="68" height="39" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0ziaigf_di" bpmnElement="Association_0ziaigf">
+        <di:waypoint x="554" y="457" />
+        <di:waypoint x="575" y="463" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BoundaryEvent_1f6tgcg_di" bpmnElement="Timer3">
+        <dc:Bounds x="745" y="434" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="712" y="468" width="36" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1nmpp8s_di" bpmnElement="Task3">
+        <dc:Bounds x="688" y="372" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1eaxfnu_di" bpmnElement="SequenceFlow_1eaxfnu">
+        <di:waypoint x="763" y="470" />
+        <di:waypoint x="763" y="532" />
+        <di:waypoint x="805" y="532" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_030a3a3_di" bpmnElement="Escalation1">
+        <dc:Bounds x="805" y="514" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="794" y="557" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_18pf0y5_di" bpmnElement="SequenceFlow_18pf0y5">
+        <di:waypoint x="788" y="412" />
+        <di:waypoint x="913" y="412" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_1jd612u_di" bpmnElement="Task4">
+        <dc:Bounds x="913" y="372" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_1wew7an_di" bpmnElement="SubProcessEscalation" isExpanded="true">
+        <dc:Bounds x="486" y="681" width="350" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_0l194ul_di" bpmnElement="StartEvent_0c03hxt">
+        <dc:Bounds x="503" y="760" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_14obqqq_di" bpmnElement="SequenceFlow_14obqqq">
+        <di:waypoint x="539" y="778" />
+        <di:waypoint x="600" y="778" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1uzk575_di" bpmnElement="SendMail2">
+        <dc:Bounds x="600" y="738" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0y6a11a_di" bpmnElement="EndEvent_0y6a11a">
+        <dc:Bounds x="761" y="760" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1fs1vqh_di" bpmnElement="SequenceFlow_1fs1vqh">
+        <di:waypoint x="700" y="778" />
+        <di:waypoint x="761" y="778" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BoundaryEvent_0rh2off_di" bpmnElement="Timer4">
+        <dc:Bounds x="975" y="434" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="929" y="462" width="37" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0fufniu_di" bpmnElement="SequenceFlow_0fufniu">
+        <di:waypoint x="993" y="470" />
+        <di:waypoint x="993" y="526" />
+        <di:waypoint x="1036" y="526" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0vyv9k8_di" bpmnElement="Escalation2">
+        <dc:Bounds x="1036" y="508" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1025" y="551" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1t8z17d_di" bpmnElement="TextAnnotation_1t8z17d">
+        <dc:Bounds x="798" y="462" width="59" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1856f3r_di" bpmnElement="Association_1856f3r">
+        <di:waypoint x="779" y="459" />
+        <di:waypoint x="798" y="468" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
